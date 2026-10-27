@@ -1,19 +1,16 @@
 # px-cpu-eosio-powerup-sponsor-pool
 
-Quest 139. Tier B. The contract calls `eosio::powerup` so a new account can get a short CPU window without staking.
+Quest 139. Private. Uncompiled sketch. There is no `npm test`. `cdt-cpp` was not run. Nothing was sent to `eosio::powerup`.
 
-## Behavior
+## What the file tries to say
 
-- `claimcpu(user)` requires the user or the contract.
-- Two claims per 24 hours. The window resets when `now - last_powerup_sec >= 86400`.
-- The first quota row is paid by the contract. That is an explicit exception to "the contract never pays RAM". Gate it on an NFT ownership check before mainnet, or the table is an open RAM faucet.
-- `net_frac = 1e8` and `cpu_frac = 5e9` are shares of the powerup pool out of 1e15, not percentages and not WAX.
-- `max_payment` is 0.50000000 WAX. If the market price of that fraction is higher, `powerup` fails and the quota change reverts with it.
+`contracts/src/px_cpu_sponsor.cpp` sketches `claimcpu(user)`:
 
-The contract needs a WAX balance and `eosio.code` on active. `days` is 1.
+- The user or the contract must authorize.
+- Two claims in 24 hours.
+- The first table row is paid by the contract. That is an open RAM faucet until an NFT check exists. It does not exist.
+- `net_frac = 1e8` and `cpu_frac = 5e9` are shares of the powerup pool out of 1e15. `max_payment` is 0.50000000 WAX.
 
-## Not done
+The contract would need a WAX balance and `eosio.code`. Neither was configured. `client/wharfkit-demo.ts` was not run.
 
-No NFT gate. No payment from the user. No refund of unused max_payment (the system contract handles that).
-
-Private while the vector suite is open.
+Do not deploy this file.
