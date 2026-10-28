@@ -35,9 +35,11 @@ test("non-positive payment is refused", () => {
 test("exhausted quota is refused", () => {
   const r = canClaim({ ...base, remaining_quota: 0 });
   assert.equal(r.ok, false);
+  if (!r.ok) assert.match(r.reason, /quota/);
 });
 
 test("insufficient pool is refused", () => {
-  const r = canClaim({ ...base, payment: 2000 });
+  const r = canClaim({ ...base, payment: 80, max_payment: 100, pool_balance: 40 });
   assert.equal(r.ok, false);
+  if (!r.ok) assert.match(r.reason, /insufficient pool/);
 });
