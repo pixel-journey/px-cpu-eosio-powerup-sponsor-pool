@@ -1,19 +1,28 @@
-# px-cpu-eosio-powerup-sponsor-pool
+# A claim gate that does not rent CPU
 
-Private. Tested TypeScript rule exists. C++ sketch is uncompiled. Nothing was sent to `eosio::powerup`.
+> **Trust:** private educational lab. C++ sketch is uncompiled.  
+> **Vault:** [px-contract-examples-vault](https://github.com/pixel-journey/px-contract-examples-vault)
 
-## What is true
+**One-sentence goal:** Teach the sponsor checks that must pass before a pool would pay `eosio::powerup`: caller is the holder string, payment is a positive integer inside `max_payment`, quota remains, and the pool covers it.
 
-`npm test` runs `invariants/powerup.test.ts`.
+**Real code:** `npm test`. **Does not** call `eosio::powerup`, prove an NFT, or decrement the pool.
 
-- Eligible holder within limits may claim.
-- Non-holder is refused.
-- Payment above `max_payment` is refused.
-- Non-positive payment is refused.
-- Exhausted quota is refused.
-- Insufficient pool balance is refused.
+The course is [EDUCATION.md](EDUCATION.md) (beginner, intermediate, masterclass). Masterclass sections are the work this repo does not do.
 
-The C++ in `contracts/src/px_cpu_sponsor.cpp` is still an uncompiled sketch. The NFT ownership gate is not implemented. `cdt-cpp` was not run. There is no wasm.
+## What is true (executed)
+
+| Rule | Result |
+| --- | --- |
+| Alice, payment 50, max 100, quota 3, pool 1000 | `{ ok: true }` |
+| Caller `bob` | refused, reason matches holder |
+| Payment 150 | refused, reason matches `max_payment` |
+| Payment 0 or -10 | `ok: false` |
+| Quota 0 | refused, reason matches quota |
+| Payment 80 against pool 40, max still 100 | refused, reason matches insufficient pool |
+
+`canClaim` does not write. A second call on the same object is still ok.
+
+`contracts/src/px_cpu_sponsor.cpp` is an uncompiled sketch. The NFT gate is not implemented. There is no wasm.
 
 ## Run
 
@@ -21,6 +30,6 @@ The C++ in `contracts/src/px_cpu_sponsor.cpp` is still an uncompiled sketch. The
 npm test
 ```
 
-No host is called.
+See [EDUCATION.md](EDUCATION.md) and [SECURITY.md](SECURITY.md).
 
-Do not deploy the sketch.
+MIT — Pixel Journey
