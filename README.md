@@ -4,26 +4,28 @@
 > **Sources:** [SOURCES.md](SOURCES.md)  
 > **Vault:** [px-contract-examples-vault](https://github.com/pixel-journey/px-contract-examples-vault)
 
-**One-sentence goal:** Teach the sponsor checks that must pass before a pool would pay `powerup`: caller is the holder, payment is a positive integer inside `max_payment`, quota remains, and the pool covers it.
+**Goal:** Teach the sponsor checks before a pool would pay `powerup`: caller is the holder, payment is a positive integer ≤ `max_payment`, quota remains, and the pool covers it.
 
-**Real code:** `npm test` (unit + **sequential composition**). **Does not** call PowerUp, prove an NFT, or broadcast.
+**Code under test:** `npm test` (unit + sequential composition). **Does not** call PowerUp or broadcast.
 
-Network docs: [docs.wax.io](https://docs.wax.io/). Always verify the live system ABI for `powerup` on the chain you target.
+## Learning materials
 
-## Composition note
-
-`powerup.composition.test.ts` runs a desk: `canClaim` stays pure; quota and pool decrement only after ok. Shared pool, per-holder quotas. Failed gates leave the desk unchanged.
+| Doc | Role |
+| --- | --- |
+| [EDUCATION.md](EDUCATION.md) | Full course |
+| [WORKED-EXAMPLES.md](WORKED-EXAMPLES.md) | Five gates + desk |
+| [TIPS.md](TIPS.md) | Pure predicate |
+| [SECURITY.md](SECURITY.md) | Abuse surface |
+| [SOURCES.md](SOURCES.md) | Official |
 
 ## What is true (executed)
 
 | Rule | Result |
 | --- | --- |
-| Valid holder + payment + quota + pool | `{ ok: true }` |
-| Wrong caller / over max / zero payment / empty quota / insufficient pool | refused |
-| `canClaim` | pure; second call still ok |
-| Sequential desk | quota/pool drain; third claim refused |
-
-## Run
+| Valid holder + payment + quota + pool | ok |
+| Wrong caller / bounds / quota / pool | refused |
+| canClaim | pure |
+| Sequential desk | drains then refuses |
 
 ```bash
 npm test
