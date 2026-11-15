@@ -1,31 +1,57 @@
-# Worked examples — powerup sponsor gate
+# Worked examples — sponsor claim gate
 
-`canClaim` is **pure**: it never mutates quota or pool. Composition tests decrement only after ok.
+`canClaim` returns `{ ok: true }` or `{ ok: false, reason }`. It never changes `remaining_quota` or `pool_balance`. The composition desk decrements only after `ok`.
 
-## Example A — all gates pass
+This is **not** an `eosio::powerup` call. No CPU is rented.
 
-caller === holder, payment in (0, max_payment], quota > 0, payment ≤ pool → `{ ok: true }`.
+## Base object (unit tests)
 
-## Example B — not the holder
+```text
+caller alice, holder alice, payment 50, max_payment 100,
+remaining_quota 3, pool_balance 1000
+→ ok
+```
 
-caller ≠ holder → `not the holder`.
+| Change | Result |
+| --- | --- |
+| caller `bob` | `not the holder` |
+| payment `150` | `exceeds max_payment` |
+| payment `100` (equal to max) | ok |
+| payment `0` or `-10` | `non-positive payment` |
+| payment `1.5` | refused (not an integer) |
+| quota `0` or `-1` | `quota exhausted` |
+| payment `80`, pool `40` | `insufficient pool` |
+| payment `40`, pool `40` | ok |
+| `canClaim` twice on the same object | still ok; quota stays `3`; pool stays `1000` |
 
-## Example C — non-positive / over max
+## Desk — one holder
 
-payment 0 or > max_payment → refused.
+Pool `1000`. Alice quota `2`, max payment `100`.
 
-## Example D — quota exhausted
+| Step | Effect |
+| --- | --- |
+| Claim `50` | paid `50`, pool `950`, quota `1` |
+| Claim `80` | paid `130`, pool `870`, quota `0` |
+| Claim `10` | throws `quota`; pool stays `870` |
 
-remaining_quota ≤ 0 → refused.
+## Desk — shared pool
 
-## Example E — insufficient pool
+Pool `200`. Alice and Bob each have quota `1` and max `100`.
 
-payment > pool_balance → refused.
+Alice claims `90`, Bob claims `100`. Pool is `10`. Both further claims fail on **quota**, not on the leftover `10`.
 
-## Example F — sequential desk
+## Failed checks do not write
 
-Two successful claims drain quota/pool in the composition harness; third fails; failed checks leave desk unchanged.
+Pool `100`, Alice quota `3`, max `50`.
 
-## Example G — honesty
+| Call | Reason |
+| --- | --- |
+| Bob claims for Alice, payment `10` | holder |
+| Alice pays `60` | max_payment |
+| Alice pays `0` | non-positive |
 
-This is **not** a call to system `powerup`. Always verify live ABI on the target chain.
+After all three: `claims` is `0`, pool is `100`, quota is `3`.
+
+## Pool empty with quota left
+
+Pool `40`, Alice quota `5`, max `100`. She claims `40`. Pool is `0`, quota is `4`. The next `1` fails `insufficient pool`. Quota is not decremented on that failure.

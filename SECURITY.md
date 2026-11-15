@@ -1,33 +1,21 @@
-# Security notes — powerup sponsor pool
+# Security
 
-## Authorization
+## Closed by tests
 
-- Only an eligible holder may call `claimpowerup` for their own account.
-- Only the admin may change `max_payment` or deposit into the pool.
-- The Pixal ownership check must read the AtomicAssets table; it must not trust a caller-supplied asset id list.
+- Caller is not the holder name.
+- Payment not a positive integer, above `max_payment`, or above `pool_balance`.
+- Quota `<= 0`.
+- A failed check does not decrement quota or pool (composition harness).
+- Calling `canClaim` twice does not mutate the input object.
 
-## Inputs and quotas
+## Not closed
 
-- Claim amount (or the computed powerup payment) must be positive and ≤ `max_payment`.
-- Daily quota must be checked and decremented atomically.
-- A claim that would exceed the remaining pool balance is refused.
-- Negative or zero payment values are refused.
+- No `require_auth`. The holder string is whoever the caller typed.
+- No system `powerup` action, no CPU weight, no `payer`.
+- No NFT or Pixal ownership check, despite older description copy.
+- Numbers are JS numbers, not asset quantities. A fractional payment is refused; a value above `Number.MAX_SAFE_INTEGER` is not modeled.
+- The desk is test-only. There is no on-chain table.
 
-## Slippage and sybil
+## Attack the purity rule stops
 
-`max_payment` is a hard guard. If the network price for the requested CPU/NET exceeds it, the action must fail rather than overpay. The Pixal-holder gate exists so one entity cannot drain the pool through many accounts.
-
-## What the tested rule covers
-
-`npm test` runs `invariants/powerup.test.ts`.
-
-- Eligible holder within limits may claim.
-- Non-holder is refused.
-- Payment above `max_payment` is refused.
-- Non-positive payment is refused.
-- Exhausted quota is refused.
-- Insufficient pool balance is refused.
-
-## Current status
-
-The TypeScript rule exists. The C++ sketch is uncompiled. The NFT ownership gate is not implemented. The sketch is not the implementation.
+If the contract decrements quota before the pool check, a too-large payment burns the user's daily claim and pays nothing. The composition test asserts the opposite: failure leaves quota and pool unchanged.
