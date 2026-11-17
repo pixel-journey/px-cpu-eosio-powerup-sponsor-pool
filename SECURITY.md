@@ -1,21 +1,35 @@
-# Security
+# Security — sponsor gate that does not rent CPU
 
-## Closed by tests
+## Closed in tests
 
-- Caller is not the holder name.
-- Payment not a positive integer, above `max_payment`, or above `pool_balance`.
-- Quota `<= 0`.
-- A failed check does not decrement quota or pool (composition harness).
-- Calling `canClaim` twice does not mutate the input object.
+| Issue | Behavior |
+| --- | --- |
+| Caller ≠ holder | refused |
+| Payment not positive integer / above max / above pool | refused |
+| Quota ≤ 0 | refused |
+| Failed check | quota and pool **unchanged** |
+| Second `canClaim` | does not mutate the input object |
 
-## Not closed
+Check order: holder → positive int → max_payment → quota → pool.
 
-- No `require_auth`. The holder string is whoever the caller typed.
-- No system `powerup` action, no CPU weight, no `payer`.
-- No NFT or Pixal ownership check, despite older description copy.
-- Numbers are JS numbers, not asset quantities. A fractional payment is refused; a value above `Number.MAX_SAFE_INTEGER` is not modeled.
-- The desk is test-only. There is no on-chain table.
+## Not closed (production)
 
-## Attack the purity rule stops
+| Concern | Guidance |
+| --- | --- |
+| Auth | Real `require_auth` — holder string is whoever the caller typed |
+| System action | No `eosio::powerup`, no CPU weight, no `payer` |
+| NFT / Pixal gate | **Not** in `canClaim` despite older description copy |
+| Amount type | JS numbers, not assets — switch to bigint before production |
+| Mutation | Decrement quota and pool only **after** ok, in the same action as powerup |
 
-If the contract decrements quota before the pool check, a too-large payment burns the user's daily claim and pays nothing. The composition test asserts the opposite: failure leaves quota and pool unchanged.
+## Attack angles
+
+1. Decrementing quota before the pool check (too-large payment burns the daily claim and pays nothing).
+2. Expecting a second pure `canClaim` to lower quota.
+3. Building a powerup action with a user-supplied action name.
+4. Confusing this with ORNG stake ([auto-stake](https://github.com/pixel-journey/px-orng-auto-wax-stake-manager)).
+5. Calling a matching string an NFT sybil gate.
+
+## Honesty limits
+
+Predicate only. Prefer system resource docs: [resources RPC](https://docs.eosnetwork.com/docs/latest/apis/rpc/resources/) · [docs.wax.io](https://docs.wax.io/).
