@@ -2,7 +2,7 @@
 
 > **Domain:** CPU PowerUp sponsor pool gate  
 > **Sources:** [SOURCES.md](SOURCES.md)  
-> **Vault:** [px-contract-examples-vault](https://github.com/pixel-journey/px-contract-examples-vault)
+> **Vault:** `px-contract-examples-vault` (private index; not this public course)
 
 **Goal:** Teach the sponsor checks before a pool would pay `powerup`: caller is the holder, payment is a positive integer ≤ `max_payment`, quota remains, and the pool covers it.
 

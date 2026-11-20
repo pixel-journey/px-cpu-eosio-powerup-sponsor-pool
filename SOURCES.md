@@ -33,4 +33,4 @@ Failed checks leave quota and pool **unchanged**. A pure second `canClaim` does 
 | [invariant kit](https://github.com/pixel-journey/px-invariant-kit) | Shared name / range checks |
 | [auto-stake](https://github.com/pixel-journey/px-orng-auto-wax-stake-manager) | ORNG credit stake, different action |
 | [pausable](https://github.com/pixel-journey/px-token-pausable-emergency-guard) | Pause the pool without a single-key trap |
-| [treasury path](https://github.com/pixel-journey/px-contract-examples-vault/blob/main/docs/TREASURY-TOKEN-LEARNING-PATH.md) | Step 14 |
+| `px-contract-examples-vault` (private index; not this public course) | Step 14 |
