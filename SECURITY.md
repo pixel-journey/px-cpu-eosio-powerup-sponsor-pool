@@ -24,12 +24,19 @@ Check order: holder → positive int → max_payment → quota → pool.
 
 ## Attack angles
 
-1. Decrementing quota before the pool check (too-large payment burns the daily claim and pays nothing).
-2. Expecting a second pure `canClaim` to lower quota.
-3. Building a powerup action with a user-supplied action name.
-4. Confusing this with ORNG stake ([auto-stake](https://github.com/pixel-journey/px-orng-auto-wax-stake-manager)).
+1. Decrementing quota before the pool check (too-large payment burns the daily claim and pays nothing).  
+2. Expecting a second pure `canClaim` to lower quota.  
+3. Building a powerup action with a user-supplied action name.  
+4. Confusing this with ORNG stake ([auto-stake](https://github.com/pixel-journey/px-orng-auto-wax-stake-manager)).  
 5. Calling a matching string an NFT sybil gate.
 
 ## Honesty limits
 
-Predicate only. Prefer system resource docs: [resources RPC](https://docs.eosnetwork.com/docs/latest/apis/rpc/resources/) · [docs.wax.io](https://docs.wax.io/).
+Predicate only. Does not call PowerUp or broadcast.
+
+| Sibling | Distinction |
+| --- | --- |
+| [ORNG auto-stake](https://github.com/pixel-journey/px-orng-auto-wax-stake-manager) | Stake path, not CPU rent |
+| [pausable guard](https://github.com/pixel-journey/px-token-pausable-emergency-guard) | Emergency flag |
+
+[resources RPC](https://docs.eosnetwork.com/docs/latest/apis/rpc/resources/) · [docs.wax.io](https://docs.wax.io/).
