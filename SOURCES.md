@@ -5,6 +5,7 @@
 | [docs.eosnetwork.com resources](https://docs.eosnetwork.com/docs/latest/apis/rpc/resources/) | Resource model vocabulary |
 | [docs.wax.io](https://docs.wax.io/) | Search current PowerUp / CPU rental guides |
 | System `powerup` | Live chain action on the system account — **this lab does not call it** |
+| [wharfkit/skill](https://github.com/wharfkit/skill) | SessionKit if a host later signs. Not a resource market |
 
 ## Product facts locked by tests
 
@@ -24,6 +25,12 @@ Failed checks leave quota and pool **unchanged**. A pure second `canClaim` does 
 - Decrement quota and pool only **after** ok, in the same action as a real powerup you actually sent.
 - This gate does **not** prove the caller holds a Pixal, and it is **not** ORNG stake ([auto-stake](https://github.com/pixel-journey/px-orng-auto-wax-stake-manager)).
 - Fields are JavaScript numbers here. Switch to bigint before production amounts near `2^53`.
+
+## Portability
+
+The **predicate order** (holder, payment bounds, quota, pool) ports. The **prices, system account, and powerup tables** are chain-local. Do not copy WAX teaching constants onto EOS or Telos as market truth. This lab is still not a `powerup` call on any chain.
+
+ORNG stake ([auto-stake](https://github.com/pixel-journey/px-orng-auto-wax-stake-manager)) is a different product and is WAX-shaped (`orng.wax`).
 
 ## Domain map
 
